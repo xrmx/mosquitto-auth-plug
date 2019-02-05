@@ -130,7 +130,7 @@ static int http_post(void *handle, char *uri, const char *clientid, const char *
 	url = (char *)malloc(urllen);
 	if (url == NULL) {
 		_fatal("ENOMEM");
-		return BACKEND_ERROR;
+		goto url_error_out;
 	}
 
 	// uri begins with a slash
@@ -151,7 +151,7 @@ static int http_post(void *handle, char *uri, const char *clientid, const char *
 	char *string_envs = (char *)malloc(MAXPARAMSLEN);
 	if (string_envs == NULL) {
 		_fatal("ENOMEM");
-		return BACKEND_ERROR;
+		goto string_envs_error_out;
 	}
 
 	memset(string_envs, 0, MAXPARAMSLEN);
@@ -166,14 +166,14 @@ static int http_post(void *handle, char *uri, const char *clientid, const char *
 		env_num = get_string_envs(curl, conf->aclcheck_envs, string_envs);
 	}
 	if( env_num == -1 ){
-		return BACKEND_ERROR;
+		goto env_num_error_out;
 	}
 	//---- over ----
 
 	data = (char *)malloc(strlen(string_envs) + strlen(escaped_username) + strlen(escaped_password) + strlen(escaped_topic) + strlen(string_acc) + strlen(escaped_clientid) + 50);
 	if (data == NULL) {
 		_fatal("ENOMEM");
-		return BACKEND_ERROR;
+		goto data_error_out;
 	}
 	sprintf(data, "%susername=%s&password=%s&topic=%s&acc=%s&clientid=%s",
 		string_envs,
@@ -221,6 +221,20 @@ static int http_post(void *handle, char *uri, const char *clientid, const char *
 	free(escaped_topic);
 	free(escaped_clientid);
 	return (ok);
+
+data_error_out:
+env_num_error_out:
+	free(string_envs);
+string_envs_error_out:
+	free(escaped_username);
+	free(escaped_password);
+	free(escaped_topic);
+	free(escaped_clientid);
+	free(url);
+url_error_out:
+	curl_easy_cleanup(curl);
+	curl_slist_free_all(headerlist);
+	return BACKEND_ERROR;
 }
 
 void *be_http_init()
