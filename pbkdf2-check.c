@@ -124,11 +124,14 @@ int pbkdf2_check(char *password, char *hash)
 
 	if ((rawSalt = malloc(strlen(salt) + 1)) == NULL) {
 		fprintf(stderr, "Out of memory\n");
+		free(out);
 		return FALSE;
 	}
 
 	saltlen = base64_decode(salt, rawSalt);
 	if (saltlen < 1) {
+		free(rawSalt);
+		free(out);
 		return (FALSE);
 	}
 
