@@ -353,9 +353,9 @@ The following `auth_opt_` options are supported by the `http` back-end:
 
 | Option            | default           |  Mandatory  | Meaning     |
 | ----------------- | ----------------- | :---------: | ----------  |
-| http_ip           |                   |      Y      | IP address, will skip DNS lookup |
+| http_ip           |                   |      Y*     | IP address, will skip DNS lookup |
 | http_port         | 80                |             | TCP port number                 |
-| http_hostname     |                   |             | hostname for HTTP header        |
+| http_hostname     |                   |      Y*     | hostname for HTTP header        |
 | http_getuser_uri  |                   |      Y      | URI for checking username/password |
 | http_superuser_uri|                   |      Y      | URI for checking superuser         |
 | http_aclcheck_uri |                   |      Y      | URI for checking acl               |
@@ -363,6 +363,7 @@ The following `auth_opt_` options are supported by the `http` back-end:
 | http_basic_auth_key|                  |             | Basic Authentication Key        |
 | http_retry_count  | 3                 |             | Number of retries done if backend is unavailable |
 
+`*` Only one between `http_ip` abd `http_hostname`is mandatory.
 If the configured URLs return an HTTP status code == `2xx`, the authentication /
 authorization succeeds. If the status code == `4xx`, authentication /
 authorization fails. For a status code == `5xx` or server `Unreachable`, the HTTP request
